@@ -1,27 +1,12 @@
-# Data files
 data/
 *.csv
 *.json
-*.parquet
-*.sqlite
-*.db
 
-# Python
 __pycache__/
-*.py[cod]
-*$py.class
 .venv/
-env/
-venv/
-.env
-
-# OS & IDE
 .DS_Store
-.vscode/
 .idea/
+.vscode/
 
-# Internal rules & screenshots
 PROJECT_RULES.md
 *.png
-*.jpg
-*.jpeg
