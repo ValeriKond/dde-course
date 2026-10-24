@@ -11,3 +11,4 @@ __pycache__/
 PROJECT_RULES.md
 *.png
 *.parquet
+!scripts/*.png
