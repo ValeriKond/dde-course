@@ -12,3 +12,4 @@ PROJECT_RULES.md
 *.png
 *.parquet
 !scripts/*.png
+.ipynb_checkpoints/
