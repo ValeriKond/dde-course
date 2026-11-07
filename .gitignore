@@ -12,3 +12,10 @@ PROJECT_RULES.md
 *.png
 *.parquet
 !scripts/*.png
+<<<<<<< Updated upstream
+=======
+.ipynb_checkpoints/
+
+.env
+*.db
+>>>>>>> Stashed changes
