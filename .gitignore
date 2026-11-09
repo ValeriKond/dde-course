@@ -13,3 +13,8 @@ PROJECT_RULES.md
 *.parquet
 !scripts/*.png
 .ipynb_checkpoints/
+
+.env
+*.db
+.ipynb_checkpoints/
+
