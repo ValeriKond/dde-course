@@ -1,10 +1,13 @@
 import os
+from pathlib import Path
 
 import gdown
 import pandas as pd
 
 FILE_ID = "1TecBD2z_Ky-DlefZBNW-lCtKOGLzRj5B"
-FILE_PATH = "data/goldapple_products.csv"
+# пути от корня репо, чтобы запускалось из любой папки
+DATA_DIR = Path(__file__).resolve().parents[2] / "data"
+FILE_PATH = DATA_DIR / "goldapple_products.csv"
 
 
 def load_data(path=FILE_PATH):

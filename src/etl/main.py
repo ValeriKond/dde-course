@@ -1,4 +1,5 @@
 import argparse
+import re
 
 from .extract import load_data
 from .load import load_to_db, save_parquet
@@ -17,6 +18,9 @@ def parse_args():
 
     if not 1 <= args.rows <= MAX_ROWS:
         parser.error(f"--rows должен быть от 1 до {MAX_ROWS}")
+    # имя таблицы потом идет в sql, поэтому только буквы, цифры и _
+    if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", args.table):
+        parser.error("--table: только латиница, цифры и _")
     return args
 
 

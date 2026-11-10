@@ -4,7 +4,9 @@ import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import URL, create_engine, text
 
-PARQUET_PATH = "data/goldapple_products.parquet"
+from .extract import DATA_DIR
+
+PARQUET_PATH = DATA_DIR / "goldapple_products.parquet"
 
 
 def save_parquet(df, path=PARQUET_PATH):

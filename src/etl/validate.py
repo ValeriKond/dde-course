@@ -18,6 +18,8 @@ def validate(df):
         errors.append("item_id пустой или повторяется")
     if df["url"].isna().any() or df["url"].duplicated().any():
         errors.append("url пустой или повторяется")
+    if df["price_actual"].isna().any() or df["price_regular"].isna().any():
+        errors.append("есть пустые цены")
     if (df["price_actual"] <= 0).any() or (df["price_regular"] <= 0).any():
         errors.append("есть цены <= 0")
     if (df["price_actual"] > df["price_regular"]).any():
