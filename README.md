@@ -39,11 +39,42 @@
 
 ## Структура
 
-- `src/data_loader.py` - загрузка датасета, приведение типов и сохранение в parquet
-- `scripts/read_api.py` - сбор датасета погоды через API Open-Meteo (дз4), подробнее в `scripts/README.md`
-- `notebooks/EDA.ipynb` - разведочный анализ датасета, оценка качества данных (дз5)
-- `scripts/write_to_db.py` - запись 100 строк датасета в удаленную БД postgres (дз7)
-- `data/` - сюда скачивается csv (в git не попадает)
+```
+dde-course/
+├── src/
+│   └── etl/              - пакет etl (дз8)
+│       ├── __init__.py
+│       ├── extract.py
+│       ├── transform.py
+│       ├── validate.py
+│       ├── load.py
+│       └── main.py
+├── scripts/
+│   ├── read_api.py       - сбор датасета погоды через API Open-Meteo (дз4), подробнее в scripts/README.md
+│   └── screenshot.png
+├── notebooks/
+│   └── EDA.ipynb         - разведочный анализ, оценка качества данных (дз5, дз6)
+├── data/                 - сюда скачивается csv и пишется parquet (в git не попадает)
+├── .env.example          - шаблон доступов к БД
+├── requirements.txt      - зависимости для etl
+└── requirements-dev.txt  - etl + то что нужно для ноутбука и read_api
+```
+
+## Пакет etl
+
+Весь цикл от сырого csv до таблицы в БД:
+
+- `extract.py` - если csv нет в `data/`, качает его с Google Drive, потом читает в датафрейм
+- `transform.py` - приводит типы колонок (что и как - в разделе "Типы" ниже)
+- `validate.py` - проверяет данные после transform: все 20 колонок на месте, item_id и url без пропусков и дублей, цены > 0 и цена со скидкой не больше обычной, рейтинг 1-5, отзывы и объем не отрицательные. Если что-то не так, падает с ошибкой и в БД ничего не пишется
+- `load.py` - сохраняет весь датасет в `data/goldapple_products.parquet` и пишет первые N строк в postgres. Если таблица уже есть, она перезаписывается. После записи считает строки в таблице и выводит первые 5
+- `main.py` - запускает все по очереди, принимает аргументы
+
+Аргументы `main.py`:
+
+- `--rows` - сколько строк писать в БД, от 1 до 100 (по умолчанию 100)
+- `--table` - имя таблицы (по умолчанию `kondaurovvv`)
+- `--skip-db` - не писать в БД, только parquet
 
 ## Как запустить
 
@@ -69,21 +100,9 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Запустить скрипт (из корня репозитория)
+Для ноутбука и `read_api.py` нужны еще dev зависимости: `pip install -r requirements-dev.txt` (туда уже входит requirements.txt)
 
-```bash
-python src/data_loader.py
-```
-
-Если датасета нет в папке `data/`, скрипт сам скачает его с Google Drive. Потом скрипт приводит типы колонок и сохраняет все в `data/goldapple_products.parquet`, в репо он не попадает.
-
-## Запись в БД
-
-Скрипт `scripts/write_to_db.py` берет первые 100 строк датасета (уже с приведенными типами) и записывает их в таблицу `kondaurovvv` в postgres. Если таблица уже есть, она перезаписывается. После записи скрипт считает строки в таблице и выводит первые 5.
-
-Доступы к БД в репо не лежат, они берутся из файла `.env` (он в `.gitignore`). Чтобы запустить:
-
-1. Скопировать шаблон и вписать туда свои доступы
+4. Прописать доступы к БД. Они в репо не лежат, берутся из файла `.env` (он в `.gitignore`)
 
 ```bash
 cp .env.example .env
@@ -95,11 +114,12 @@ cp .env.example .env
 - `DB_PASSWORD` - пароль
 - `DB_ROOT_BASE` - название базы
 
-2. Поставить зависимости (если еще не стоят) и запустить из корня репозитория
+5. Запустить etl из корня репозитория
 
 ```bash
-pip install -r requirements.txt
-python scripts/write_to_db.py
+python -m src.etl.main
+python -m src.etl.main --rows 50 --table test_table
+python -m src.etl.main --skip-db
 ```
 
 ## Типы

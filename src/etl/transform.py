@@ -1,21 +1,8 @@
-import os
-
-import gdown
 import pandas as pd
 
-FILE_ID = "1TecBD2z_Ky-DlefZBNW-lCtKOGLzRj5B"
-FILE_PATH = "data/goldapple_products.csv"
-PARQUET_PATH = "data/goldapple_products.parquet"
-
-
-def load_data():
-    # если файла нет, качаем с гугл диска
-    if not os.path.exists(FILE_PATH):
-        os.makedirs("data", exist_ok=True)
-        gdown.download(f"https://drive.google.com/uc?id={FILE_ID}", FILE_PATH, quiet=False)
-
-    df = pd.read_csv(FILE_PATH)
-    return df
+CAT_COLS = ["brand", "category_main", "category_sub", "target_area", "skin_type",
+            "target_audience", "application_time", "country"]
+TEXT_COLS = ["name", "product_type", "purpose", "active_ingredient", "url"]
 
 
 def fix_types(df):
@@ -40,25 +27,9 @@ def fix_types(df):
     df["country"] = df["country"].str.strip()
     df.loc[df["country"] == "", "country"] = None
 
-    cat_cols = ["brand", "category_main", "category_sub", "target_area", "skin_type",
-                "target_audience", "application_time", "country"]
-    for col in cat_cols:
+    for col in CAT_COLS:
         df[col] = df[col].astype("category")
-
-    text_cols = ["name", "product_type", "purpose", "active_ingredient", "url"]
-    for col in text_cols:
+    for col in TEXT_COLS:
         df[col] = df[col].astype("string")
 
     return df
-
-
-def save_parquet(df):
-    df.to_parquet(PARQUET_PATH, index=False)
-    print("сохранено в", PARQUET_PATH)
-
-
-if __name__ == "__main__":
-    df = load_data()
-    df = fix_types(df)
-    print(df.dtypes)
-    save_parquet(df)

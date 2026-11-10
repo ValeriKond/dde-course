@@ -1,15 +1,15 @@
 import os
-import sys
 
 import pandas as pd
 from dotenv import load_dotenv
 from sqlalchemy import URL, create_engine, text
 
-sys.path.append("src")
-from data_loader import load_data, fix_types
+PARQUET_PATH = "data/goldapple_products.parquet"
 
-TABLE_NAME = "kondaurovvv"
-N_ROWS = 100
+
+def save_parquet(df, path=PARQUET_PATH):
+    df.to_parquet(path, index=False)
+    print("сохранено в", path)
 
 
 def get_engine():
@@ -26,14 +26,12 @@ def get_engine():
     return create_engine(url)
 
 
-if __name__ == "__main__":
-    df = fix_types(load_data()).head(N_ROWS)
-
+def load_to_db(df, table):
     engine = get_engine()
-    df.to_sql(TABLE_NAME, engine, if_exists="replace", index=False)
+    df.to_sql(table, engine, if_exists="replace", index=False)
 
     # проверяем что реально записалось
     with engine.connect() as conn:
-        count = conn.execute(text(f"SELECT count(*) FROM {TABLE_NAME}")).scalar()
+        count = conn.execute(text(f'SELECT count(*) FROM "{table}"')).scalar()
     print("записано строк:", count)
-    print(pd.read_sql(f"SELECT * FROM {TABLE_NAME} LIMIT 5", engine).to_string())
+    print(pd.read_sql(f'SELECT * FROM "{table}" LIMIT 5', engine).to_string())
