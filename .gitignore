@@ -16,5 +16,4 @@ PROJECT_RULES.md
 
 .env
 *.db
-.ipynb_checkpoints/
 
